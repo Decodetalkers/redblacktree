@@ -263,6 +263,7 @@ impl Insert for ATree {
                             z.roate();
                         } else {
                             // same as is left
+                            // uncule, ppl(parent's parent's left)
                             let y = pp.borrow().left.as_ref().map(Rc::clone);
                             // if y.color == Red
                             // and if y is none , it is also black
@@ -300,7 +301,10 @@ impl Insert for ATree {
                                         Some(Rc::clone(&z));
                                 }
                             }
-                            // RIGHT_ROTATION
+                            // Left_ROTATION
+                            // parent and pp exists
+                            //
+                            // and uncule should be Black, then can roate
                             if (!(z.borrow().parent.is_none()
                                 || z.borrow()
                                     .parent
@@ -367,6 +371,7 @@ impl Insert for ATree {
                                         Some(Rc::clone(&zpp));
                                 }
                             }
+                            // finally check the new root
                             z.roate();
                         }
                     }
