@@ -2,8 +2,8 @@
 //use std::borrow::Borrow;
 use std::cell::RefCell;
 //use std::cmp::Ordering;
-use std::rc::Rc;
 use redblacktree::*;
+use std::rc::Rc;
 fn main() {
     let mut a = ATree::build();
     a = a.push(2);
@@ -27,7 +27,7 @@ fn main() {
     }
     let d = f.search(-7);
     if d.is_some() {
-        println!("{}",d.as_ref().unwrap().show());
+        println!("{}", d.as_ref().unwrap().show());
     }
     //println!("{}", f.show());
 }

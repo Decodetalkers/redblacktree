@@ -154,7 +154,16 @@ impl Insert for ATree {
                                 }
                             }
                             // RIGHT_ROTATION
-                            if !(z.borrow().parent.is_none() || z.borrow().parent.as_ref().unwrap().as_ref().borrow().parent.is_none()){
+                            if !(z.borrow().parent.is_none()
+                                || z.borrow()
+                                    .parent
+                                    .as_ref()
+                                    .unwrap()
+                                    .as_ref()
+                                    .borrow()
+                                    .parent
+                                    .is_none())
+                            {
                                 //println!("debug: {}",z.as_ref().borrow().num);
                                 //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
                                 let zp = Rc::clone(z.borrow().parent.as_ref().unwrap());
@@ -225,7 +234,16 @@ impl Insert for ATree {
                                 }
                             }
                             // RIGHT_ROTATION
-                            if !(z.borrow().parent.is_none() || z.borrow().parent.as_ref().unwrap().as_ref().borrow().parent.is_none()){
+                            if !(z.borrow().parent.is_none()
+                                || z.borrow()
+                                    .parent
+                                    .as_ref()
+                                    .unwrap()
+                                    .as_ref()
+                                    .borrow()
+                                    .parent
+                                    .is_none())
+                            {
                                 //println!("debug: {}",z.as_ref().borrow().num);
                                 //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
                                 let zp = Rc::clone(z.borrow().parent.as_ref().unwrap());
@@ -256,7 +274,6 @@ impl Insert for ATree {
 
                                 z.roate();
                             }
-
                         }
                     }
                 }
@@ -328,10 +345,23 @@ impl Show for ATree {
     fn show_color(&self) -> String {
         match (&self.borrow().left, &self.borrow().right) {
             (None, None) => format!("[{}]", self.borrow().color.show_color()),
-            (Some(left), None) => format!("[{},{}]", left.show_color(), self.borrow().color.show_color()),
-            (None, Some(right)) => format!("[{},{}]", self.borrow().color.show_color(), right.show_color()),
+            (Some(left), None) => format!(
+                "[{},{}]",
+                left.show_color(),
+                self.borrow().color.show_color()
+            ),
+            (None, Some(right)) => format!(
+                "[{},{}]",
+                self.borrow().color.show_color(),
+                right.show_color()
+            ),
             (Some(left), Some(right)) => {
-                format!("[{},{},{}]", left.show_color(), self.borrow().color.show_color(), right.show_color())
+                format!(
+                    "[{},{},{}]",
+                    left.show_color(),
+                    self.borrow().color.show_color(),
+                    right.show_color()
+                )
             }
         }
     }
@@ -352,4 +382,3 @@ impl Find for ATree {
         }
     }
 }
-
