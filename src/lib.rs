@@ -1,5 +1,5 @@
 //! A R-B tree in save rust
-//! 
+//!
 //! Keywords:
 //! - Safe rust
 use std::cell::RefCell;
@@ -100,7 +100,7 @@ pub trait Show {
     /// ```
     fn show(&self) -> String;
     /// for debug
-    /// example 
+    /// example
     /// ```
     /// let mut a = ATree::build();
     /// a = a.push(5);
@@ -194,7 +194,7 @@ impl Insert for ATree {
                                 }
                             }
                             // RIGHT_ROTATION
-                            if !(z.borrow().parent.is_none()
+                            if (!(z.borrow().parent.is_none()
                                 || z.borrow()
                                     .parent
                                     .as_ref()
@@ -202,7 +202,35 @@ impl Insert for ATree {
                                     .as_ref()
                                     .borrow()
                                     .parent
-                                    .is_none())
+                                    .is_none()))
+                                && (z
+                                    .borrow()
+                                    .parent
+                                    .as_ref()
+                                    .unwrap()
+                                    .borrow()
+                                    .parent
+                                    .as_ref()
+                                    .unwrap()
+                                    .borrow()
+                                    .right
+                                    .is_none()
+                                    || z.borrow()
+                                        .parent
+                                        .as_ref()
+                                        .unwrap()
+                                        .borrow()
+                                        .parent
+                                        .as_ref()
+                                        .unwrap()
+                                        .as_ref()
+                                        .borrow()
+                                        .right
+                                        .as_ref()
+                                        .unwrap()
+                                        .borrow()
+                                        .color
+                                        == Color::Black)
                             {
                                 //println!("debug: {}",z.as_ref().borrow().num);
                                 //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
@@ -231,9 +259,8 @@ impl Insert for ATree {
                                     beta.as_ref().unwrap().borrow_mut().parent =
                                         Some(Rc::clone(&zpp));
                                 }
-
-                                z.roate();
                             }
+                            z.roate();
                         } else {
                             // same as is left
                             let y = pp.borrow().left.as_ref().map(Rc::clone);
@@ -249,7 +276,7 @@ impl Insert for ATree {
                                 // z.p.p.color = red
 
                                 z = Rc::clone(&pp);
-                            // else if z == z.p.right
+                            // else if z == z.p.left
                             } else if num_p_l.is_some()
                                 && num_p_l.as_ref().unwrap().borrow().num == num
                             {
@@ -274,7 +301,7 @@ impl Insert for ATree {
                                 }
                             }
                             // RIGHT_ROTATION
-                            if !(z.borrow().parent.is_none()
+                            if (!(z.borrow().parent.is_none()
                                 || z.borrow()
                                     .parent
                                     .as_ref()
@@ -282,7 +309,35 @@ impl Insert for ATree {
                                     .as_ref()
                                     .borrow()
                                     .parent
-                                    .is_none())
+                                    .is_none()))
+                                && (z
+                                    .borrow()
+                                    .parent
+                                    .as_ref()
+                                    .unwrap()
+                                    .borrow()
+                                    .parent
+                                    .as_ref()
+                                    .unwrap()
+                                    .borrow()
+                                    .left
+                                    .is_none()
+                                    || z.borrow()
+                                        .parent
+                                        .as_ref()
+                                        .unwrap()
+                                        .borrow()
+                                        .parent
+                                        .as_ref()
+                                        .unwrap()
+                                        .as_ref()
+                                        .borrow()
+                                        .left
+                                        .as_ref()
+                                        .unwrap()
+                                        .borrow()
+                                        .color
+                                        == Color::Black)
                             {
                                 //println!("debug: {}",z.as_ref().borrow().num);
                                 //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
@@ -311,9 +366,8 @@ impl Insert for ATree {
                                     beta.as_ref().unwrap().borrow_mut().parent =
                                         Some(Rc::clone(&zpp));
                                 }
-
-                                z.roate();
                             }
+                            z.roate();
                         }
                     }
                 }

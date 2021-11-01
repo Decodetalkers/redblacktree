@@ -14,9 +14,10 @@ fn main() {
     println!("{}", a.show());
 
     let mut f = Rc::new(RefCell::new(Tree::default()));
-    for i in (0..5).rev() {
+    for i in (1..10).rev() {
         f = f.push(i);
         println!("2 it is{}", f.show());
+        println!("2 it is{}", f.show_color());
     }
     let mut f = Rc::new(RefCell::new(Tree::default()));
     //f.borrow_mut().num = -4;
