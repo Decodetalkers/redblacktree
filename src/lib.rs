@@ -1,3 +1,7 @@
+//! A R-B tree in save rust
+//! 
+//! Keywords:
+//! - Safe rust
 use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::rc::Rc;
@@ -50,6 +54,11 @@ impl Tree {
 }
 pub type ATree = Rc<RefCell<Tree>>;
 pub trait Build {
+    /// Build a new redblacktree
+    /// example
+    /// ```
+    /// let mut a = ATree::build();
+    /// ```
     fn build() -> Self;
 }
 trait Insert {
@@ -59,13 +68,44 @@ trait Insert {
     //fn push(&self, input: i32) -> ATree;
 }
 pub trait Push {
+    /// use it to push a word
+    /// example
+    /// ```
+    /// let mut a = ATree::build();
+    /// a = a.push(2);
+    /// ```
+    ///
     fn push(&self, input: i32) -> Self;
 }
 pub trait Find {
+    /// find the node
+    /// eample
+    /// ```
+    /// let mut a = ATree::build();
+    /// for i in 0..100 {
+    ///     a = a.push(i);
+    /// }
+    /// let b = a.find(90);
+    /// println!("{}",b.as_ref().unwrap().show());
+    /// ```
     fn search(&self, input: i32) -> Option<ATree>;
 }
 pub trait Show {
+    /// show the struct of redblack tree
+    /// example
+    /// ```
+    /// let mut a = ATree::build();
+    /// a = a.push(5);
+    /// println!("{}",a.show());
+    /// ```
     fn show(&self) -> String;
+    /// for debug
+    /// example 
+    /// ```
+    /// let mut a = ATree::build();
+    /// a = a.push(5);
+    /// println!("{}",a.show_color());
+    /// ```
     fn show_color(&self) -> String;
 }
 impl Push for ATree {
