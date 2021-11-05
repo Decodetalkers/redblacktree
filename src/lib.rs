@@ -141,242 +141,233 @@ impl Insert for ATree {
             let parent = Rc::clone(self.borrow().parent.as_ref().unwrap());
             // while z.p.color == Red
             let parent_color = parent.borrow().color;
-            match parent_color {
-                Color::Red => {
-                    if parent.borrow().parent.is_some() {
-                        let pp = Rc::clone(parent.borrow().parent.as_ref().unwrap());
-                        //if let Some(ref pp) = Rc::clone(&parent).borrow().parent {
-                        // here to know where the tree is
-                        let num_p = parent.borrow().num;
-                        // z.p.r
-                        let num_p_r = &parent.borrow().right.clone();
-                        let num_p_l = &parent.borrow().left.clone();
-                        let num_ppl = &pp.borrow().left.clone();
-                        // if z.p == z.p.p.left
-                        // and if z.p.p.left is none , it color should be black
-                        if num_ppl.is_some() && num_ppl.as_ref().unwrap().borrow().num == num_p {
-                            // y = z.p.p.right
-                            let y = pp.borrow().right.as_ref().map(Rc::clone);
-                            // if y.color == Red
-                            // and if y is none , it is also black
-                            if y.is_some() && y.as_ref().unwrap().borrow().color == Color::Red {
-                                // z.p.color = black
-                                //self.borrow_mut().parent.as_mut().unwrap().borrow_mut().color = Color::Black;
-                                pp.borrow_mut().color = Color::Red;
-                                parent.borrow_mut().color = Color::Black;
-                                // y.color= black
-                                y.as_ref().unwrap().borrow_mut().color = Color::Black;
-                                // z.p.p.color = red
+            if let Color::Red = parent_color {
+                if parent.borrow().parent.is_some() {
+                    let pp = Rc::clone(parent.borrow().parent.as_ref().unwrap());
+                    //if let Some(ref pp) = Rc::clone(&parent).borrow().parent {
+                    // here to know where the tree is
+                    let num_p = parent.borrow().num;
+                    // z.p.r
+                    let num_p_r = &parent.borrow().right.clone();
+                    let num_p_l = &parent.borrow().left.clone();
+                    let num_ppl = &pp.borrow().left.clone();
+                    // if z.p == z.p.p.left
+                    // and if z.p.p.left is none , it color should be black
+                    if num_ppl.is_some() && num_ppl.as_ref().unwrap().borrow().num == num_p {
+                        // y = z.p.p.right
+                        let y = pp.borrow().right.as_ref().map(Rc::clone);
+                        // if y.color == Red
+                        // and if y is none , it is also black
+                        if y.is_some() && y.as_ref().unwrap().borrow().color == Color::Red {
+                            // z.p.color = black
+                            //self.borrow_mut().parent.as_mut().unwrap().borrow_mut().color = Color::Black;
+                            pp.borrow_mut().color = Color::Red;
+                            parent.borrow_mut().color = Color::Black;
+                            // y.color= black
+                            y.as_ref().unwrap().borrow_mut().color = Color::Black;
+                            // z.p.p.color = red
 
-                                z = Rc::clone(&pp);
-                            // else if z == z.p.right
-                            } else if num_p_r.is_some()
-                                && num_p_r.as_ref().unwrap().borrow().num == num
+                            z = Rc::clone(&pp);
+                        // else if z == z.p.right
+                        } else if num_p_r.is_some() && num_p_r.as_ref().unwrap().borrow().num == num
+                        {
+                            // z = z.p
+                            z = Rc::clone(&parent);
+                            // it is upper
+                            let beta = self.borrow().right.as_ref().map(Rc::clone);
+                            self.borrow_mut().parent = Some(Rc::clone(&pp));
+                            if pp.borrow().left.is_some()
+                                && pp.borrow().left.as_ref().unwrap().borrow().num == num_p
                             {
-                                // z = z.p
-                                z = Rc::clone(&parent);
-                                // it is upper
-                                let beta = self.borrow().right.as_ref().map(Rc::clone);
-                                self.borrow_mut().parent = Some(Rc::clone(&pp));
-                                if pp.borrow().left.is_some()
-                                    && pp.borrow().left.as_ref().unwrap().borrow().num == num_p
-                                {
-                                    pp.borrow_mut().left = Some(Rc::clone(self));
-                                } else {
-                                    pp.borrow_mut().right = Some(Rc::clone(self));
-                                }
-                                self.borrow_mut().left = Some(Rc::clone(&z));
-                                z.borrow_mut().parent = Some(Rc::clone(self));
-                                z.borrow_mut().right = beta.clone();
-                                if beta.is_some() {
-                                    beta.as_ref().unwrap().borrow_mut().parent =
-                                        Some(Rc::clone(&z));
-                                }
+                                pp.borrow_mut().left = Some(Rc::clone(self));
+                            } else {
+                                pp.borrow_mut().right = Some(Rc::clone(self));
                             }
-                            // RIGHT_ROTATION
-                            if (!(z.borrow().parent.is_none()
+                            self.borrow_mut().left = Some(Rc::clone(&z));
+                            z.borrow_mut().parent = Some(Rc::clone(self));
+                            z.borrow_mut().right = beta.clone();
+                            if beta.is_some() {
+                                beta.as_ref().unwrap().borrow_mut().parent = Some(Rc::clone(&z));
+                            }
+                        }
+                        // RIGHT_ROTATION
+                        if (!(z.borrow().parent.is_none()
+                            || z.borrow()
+                                .parent
+                                .as_ref()
+                                .unwrap()
+                                .as_ref()
+                                .borrow()
+                                .parent
+                                .is_none()))
+                            && (z
+                                .borrow()
+                                .parent
+                                .as_ref()
+                                .unwrap()
+                                .borrow()
+                                .parent
+                                .as_ref()
+                                .unwrap()
+                                .borrow()
+                                .right
+                                .is_none()
                                 || z.borrow()
                                     .parent
                                     .as_ref()
                                     .unwrap()
-                                    .as_ref()
-                                    .borrow()
-                                    .parent
-                                    .is_none()))
-                                && (z
                                     .borrow()
                                     .parent
                                     .as_ref()
                                     .unwrap()
-                                    .borrow()
-                                    .parent
                                     .as_ref()
-                                    .unwrap()
                                     .borrow()
                                     .right
-                                    .is_none()
-                                    || z.borrow()
-                                        .parent
-                                        .as_ref()
-                                        .unwrap()
-                                        .borrow()
-                                        .parent
-                                        .as_ref()
-                                        .unwrap()
-                                        .as_ref()
-                                        .borrow()
-                                        .right
-                                        .as_ref()
-                                        .unwrap()
-                                        .borrow()
-                                        .color
-                                        == Color::Black)
-                            {
-                                //println!("debug: {}",z.as_ref().borrow().num);
-                                //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
-                                let zp = Rc::clone(z.borrow().parent.as_ref().unwrap());
-                                let zpp = Rc::clone(zp.borrow().parent.as_ref().unwrap());
-                                zp.borrow_mut().color = Color::Black;
-                                zpp.borrow_mut().color = Color::Red;
-                                let ppp = zpp.borrow().parent.as_ref().map(Rc::clone);
-                                let beta = zp.borrow().right.as_ref().map(Rc::clone);
-                                zp.borrow_mut().parent = ppp.clone();
-                                if ppp.is_some() {
-                                    let ppparent = Rc::clone(ppp.as_ref().unwrap());
-                                    let isleft = ppparent.borrow().left.is_some()
-                                        && ppparent.borrow().left.as_ref().unwrap().borrow().num
-                                            == zpp.borrow().num;
-                                    if isleft {
-                                        ppparent.borrow_mut().left = Some(Rc::clone(&zp));
-                                    } else {
-                                        ppparent.borrow_mut().right = Some(Rc::clone(&zp));
-                                    }
-                                }
-                                zp.borrow_mut().right = Some(Rc::clone(&zpp));
-                                zpp.borrow_mut().parent = Some(Rc::clone(&zp));
-                                zpp.borrow_mut().left = beta.clone();
-                                if beta.is_some() {
-                                    beta.as_ref().unwrap().borrow_mut().parent =
-                                        Some(Rc::clone(&zpp));
-                                }
-                            }
-                            z.roate();
-                        } else {
-                            // same as is left
-                            // uncule, ppl(parent's parent's left)
-                            let y = pp.borrow().left.as_ref().map(Rc::clone);
-                            // if y.color == Red
-                            // and if y is none , it is also black
-                            if y.is_some() && y.as_ref().unwrap().borrow().color == Color::Red {
-                                // z.p.color = black
-                                //self.borrow_mut().parent.as_mut().unwrap().borrow_mut().color = Color::Black;
-                                pp.borrow_mut().color = Color::Red;
-                                parent.borrow_mut().color = Color::Black;
-                                // y.color= black
-                                y.as_ref().unwrap().borrow_mut().color = Color::Black;
-                                // z.p.p.color = red
-
-                                z = Rc::clone(&pp);
-                            // else if z == z.p.left
-                            } else if num_p_l.is_some()
-                                && num_p_l.as_ref().unwrap().borrow().num == num
-                            {
-                                // z = z.p
-                                z = Rc::clone(&parent);
-                                // it is upper
-                                let beta = self.borrow().left.as_ref().map(Rc::clone);
-                                self.borrow_mut().parent = Some(Rc::clone(&pp));
-                                if pp.borrow().right.is_some()
-                                    && pp.borrow().right.as_ref().unwrap().borrow().num == num_p
-                                {
-                                    pp.borrow_mut().right = Some(Rc::clone(self));
+                                    .as_ref()
+                                    .unwrap()
+                                    .borrow()
+                                    .color
+                                    == Color::Black)
+                        {
+                            //println!("debug: {}",z.as_ref().borrow().num);
+                            //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
+                            let zp = Rc::clone(z.borrow().parent.as_ref().unwrap());
+                            let zpp = Rc::clone(zp.borrow().parent.as_ref().unwrap());
+                            zp.borrow_mut().color = Color::Black;
+                            zpp.borrow_mut().color = Color::Red;
+                            let ppp = zpp.borrow().parent.as_ref().map(Rc::clone);
+                            let beta = zp.borrow().right.as_ref().map(Rc::clone);
+                            zp.borrow_mut().parent = ppp.clone();
+                            if ppp.is_some() {
+                                let ppparent = Rc::clone(ppp.as_ref().unwrap());
+                                let isleft = ppparent.borrow().left.is_some()
+                                    && ppparent.borrow().left.as_ref().unwrap().borrow().num
+                                        == zpp.borrow().num;
+                                if isleft {
+                                    ppparent.borrow_mut().left = Some(Rc::clone(&zp));
                                 } else {
-                                    pp.borrow_mut().left = Some(Rc::clone(self));
-                                }
-                                self.borrow_mut().right = Some(Rc::clone(&z));
-                                z.borrow_mut().parent = Some(Rc::clone(self));
-                                z.borrow_mut().left = beta.clone();
-                                if beta.is_some() {
-                                    beta.as_ref().unwrap().borrow_mut().parent =
-                                        Some(Rc::clone(&z));
+                                    ppparent.borrow_mut().right = Some(Rc::clone(&zp));
                                 }
                             }
-                            // Left_ROTATION
-                            // parent and pp exists
-                            //
-                            // and uncule should be Black, then can roate
-                            if (!(z.borrow().parent.is_none()
+                            zp.borrow_mut().right = Some(Rc::clone(&zpp));
+                            zpp.borrow_mut().parent = Some(Rc::clone(&zp));
+                            zpp.borrow_mut().left = beta.clone();
+                            if beta.is_some() {
+                                beta.as_ref().unwrap().borrow_mut().parent = Some(Rc::clone(&zpp));
+                            }
+                        }
+                        z.roate();
+                    } else {
+                        // same as is left
+                        // uncule, ppl(parent's parent's left)
+                        let y = pp.borrow().left.as_ref().map(Rc::clone);
+                        // if y.color == Red
+                        // and if y is none , it is also black
+                        if y.is_some() && y.as_ref().unwrap().borrow().color == Color::Red {
+                            // z.p.color = black
+                            //self.borrow_mut().parent.as_mut().unwrap().borrow_mut().color = Color::Black;
+                            pp.borrow_mut().color = Color::Red;
+                            parent.borrow_mut().color = Color::Black;
+                            // y.color= black
+                            y.as_ref().unwrap().borrow_mut().color = Color::Black;
+                            // z.p.p.color = red
+
+                            z = Rc::clone(&pp);
+                        // else if z == z.p.left
+                        } else if num_p_l.is_some() && num_p_l.as_ref().unwrap().borrow().num == num
+                        {
+                            // z = z.p
+                            z = Rc::clone(&parent);
+                            // it is upper
+                            let beta = self.borrow().left.as_ref().map(Rc::clone);
+                            self.borrow_mut().parent = Some(Rc::clone(&pp));
+                            if pp.borrow().right.is_some()
+                                && pp.borrow().right.as_ref().unwrap().borrow().num == num_p
+                            {
+                                pp.borrow_mut().right = Some(Rc::clone(self));
+                            } else {
+                                pp.borrow_mut().left = Some(Rc::clone(self));
+                            }
+                            self.borrow_mut().right = Some(Rc::clone(&z));
+                            z.borrow_mut().parent = Some(Rc::clone(self));
+                            z.borrow_mut().left = beta.clone();
+                            if beta.is_some() {
+                                beta.as_ref().unwrap().borrow_mut().parent = Some(Rc::clone(&z));
+                            }
+                        }
+                        // Left_ROTATION
+                        // parent and pp exists
+                        //
+                        // and uncule should be Black, then can roate
+                        if (!(z.borrow().parent.is_none()
+                            || z.borrow()
+                                .parent
+                                .as_ref()
+                                .unwrap()
+                                .as_ref()
+                                .borrow()
+                                .parent
+                                .is_none()))
+                            && (z
+                                .borrow()
+                                .parent
+                                .as_ref()
+                                .unwrap()
+                                .borrow()
+                                .parent
+                                .as_ref()
+                                .unwrap()
+                                .borrow()
+                                .left
+                                .is_none()
                                 || z.borrow()
                                     .parent
                                     .as_ref()
                                     .unwrap()
-                                    .as_ref()
-                                    .borrow()
-                                    .parent
-                                    .is_none()))
-                                && (z
                                     .borrow()
                                     .parent
                                     .as_ref()
                                     .unwrap()
-                                    .borrow()
-                                    .parent
                                     .as_ref()
-                                    .unwrap()
                                     .borrow()
                                     .left
-                                    .is_none()
-                                    || z.borrow()
-                                        .parent
-                                        .as_ref()
-                                        .unwrap()
-                                        .borrow()
-                                        .parent
-                                        .as_ref()
-                                        .unwrap()
-                                        .as_ref()
-                                        .borrow()
-                                        .left
-                                        .as_ref()
-                                        .unwrap()
-                                        .borrow()
-                                        .color
-                                        == Color::Black)
-                            {
-                                //println!("debug: {}",z.as_ref().borrow().num);
-                                //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
-                                let zp = Rc::clone(z.borrow().parent.as_ref().unwrap());
-                                let zpp = Rc::clone(zp.borrow().parent.as_ref().unwrap());
-                                zp.borrow_mut().color = Color::Black;
-                                zpp.borrow_mut().color = Color::Red;
-                                let ppp = zpp.borrow().parent.as_ref().map(Rc::clone);
-                                let beta = zp.borrow().left.as_ref().map(Rc::clone);
-                                zp.borrow_mut().parent = ppp.clone();
-                                if ppp.is_some() {
-                                    let ppparent = Rc::clone(ppp.as_ref().unwrap());
-                                    let isright = ppparent.borrow().right.is_some()
-                                        && ppparent.borrow().right.as_ref().unwrap().borrow().num
-                                            == zpp.borrow().num;
-                                    if isright {
-                                        ppparent.borrow_mut().right = Some(Rc::clone(&zp));
-                                    } else {
-                                        ppparent.borrow_mut().left = Some(Rc::clone(&zp));
-                                    }
-                                }
-                                zp.borrow_mut().left = Some(Rc::clone(&zpp));
-                                zpp.borrow_mut().parent = Some(Rc::clone(&zp));
-                                zpp.borrow_mut().right = beta.clone();
-                                if beta.is_some() {
-                                    beta.as_ref().unwrap().borrow_mut().parent =
-                                        Some(Rc::clone(&zpp));
+                                    .as_ref()
+                                    .unwrap()
+                                    .borrow()
+                                    .color
+                                    == Color::Black)
+                        {
+                            //println!("debug: {}",z.as_ref().borrow().num);
+                            //println!("debug: {}",z.as_ref().borrow().parent.as_ref().unwrap().borrow().num);
+                            let zp = Rc::clone(z.borrow().parent.as_ref().unwrap());
+                            let zpp = Rc::clone(zp.borrow().parent.as_ref().unwrap());
+                            zp.borrow_mut().color = Color::Black;
+                            zpp.borrow_mut().color = Color::Red;
+                            let ppp = zpp.borrow().parent.as_ref().map(Rc::clone);
+                            let beta = zp.borrow().left.as_ref().map(Rc::clone);
+                            zp.borrow_mut().parent = ppp.clone();
+                            if ppp.is_some() {
+                                let ppparent = Rc::clone(ppp.as_ref().unwrap());
+                                let isright = ppparent.borrow().right.is_some()
+                                    && ppparent.borrow().right.as_ref().unwrap().borrow().num
+                                        == zpp.borrow().num;
+                                if isright {
+                                    ppparent.borrow_mut().right = Some(Rc::clone(&zp));
+                                } else {
+                                    ppparent.borrow_mut().left = Some(Rc::clone(&zp));
                                 }
                             }
-                            // finally check the new root
-                            z.roate();
+                            zp.borrow_mut().left = Some(Rc::clone(&zpp));
+                            zpp.borrow_mut().parent = Some(Rc::clone(&zp));
+                            zpp.borrow_mut().right = beta.clone();
+                            if beta.is_some() {
+                                beta.as_ref().unwrap().borrow_mut().parent = Some(Rc::clone(&zpp));
+                            }
                         }
+                        // finally check the new root
+                        z.roate();
                     }
                 }
-                Color::Black => {}
             }
             //}
         }
