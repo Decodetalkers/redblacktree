@@ -75,6 +75,7 @@ pub trait Push {
     /// a = a.push(2);
     /// ```
     ///
+    #[must_use]
     fn push(&self, input: i32) -> Self;
 }
 pub trait Find {
